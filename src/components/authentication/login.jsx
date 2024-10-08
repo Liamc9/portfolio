@@ -8,7 +8,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase-config";
 import { useNavigate, Link } from "react-router-dom";
-import Input from "./input";
+import Input from "../input";
 
 const LoginPage = ({ themeColor = "purple-500" }) => {
   const [email, setEmail] = useState("");

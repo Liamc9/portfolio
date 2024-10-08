@@ -11,7 +11,7 @@ import { db } from "../../firebase-config";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import Input from "./input";
+import Input from "../input";
 
 const SignupPage = ({ themeColor = "purple-500" }) => {
   const [email, setEmail] = useState("");

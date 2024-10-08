@@ -1,8 +1,9 @@
 import { Outlet, useLocation } from "react-router-dom";
-      import NavBar from "../components/navigation/topnavbar";
-      import BottomNavBar from "../components/navigation/bottomnavbar";
+      import TopNavBar2 from "../components/navigation/TopNavBar2";
       import { useEffect } from "react";
-      import SideNav from "../components/navigation/sidenav";
+      import SideNav from "../components/navigation/SideNav";
+import { TabProvider } from "../components/TabContext";
+import { DataProvider } from '../components/DataContext';
 
       export default function Root() {
         const location = useLocation();
@@ -32,16 +33,19 @@ import { Outlet, useLocation } from "react-router-dom";
 
         return (
           <>
+          <DataProvider>
+              <TabProvider>
             <div className="min-h-screen overflow-y-auto overflow-x-hidden bg-white">
-              <div className="md:hidden">
-                {!shouldHideTopNav() && <NavBar />}
-                {!shouldHideBottomNavBar() && <BottomNavBar />}
+              <div className="hidden md:block">
+                {!shouldHideTopNav() && <TopNavBar2 />}
               </div>
               <div className="hidden md:block">
                 {!shouldHideSideNav() && <SideNav />}
               </div>
               <Outlet />
             </div>
+          </TabProvider>
+          </DataProvider>
           </>
         );
       }
