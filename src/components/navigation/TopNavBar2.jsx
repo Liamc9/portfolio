@@ -17,12 +17,9 @@ const TopNavBar2 = () => {
   return (
     <div className="absolute top-0 left-0 w-full z-50 flex items-center h-[62px] whitespace-nowrap font-semibold text-[15px] border-b border-opacity-25 border-[#2c2d2a] bg-[var(--beach-bg)]">
       <SideNav />
-      <img
-        className="w-[116px] logo ml-16"
-        src="https://cdn.shopify.com/s/files/1/0689/1443/files/CLOSCA-LOGO-WEB-BLACK_130x@2x.png?v=1559116993"
-        alt="Closca Logo"
-      />
-      <div className="hidden sm:flex ml-auto items-center space-x-8 header-menu">
+      <p className='absolute left-16 text-3xl font-bold'>Liam Crowley</p>
+      
+      <div className="hidden sm:flex mx-auto space-x-8 md:text-xl">
         {menuItems.map((item) => (
           <button
             key={item}
@@ -37,7 +34,7 @@ const TopNavBar2 = () => {
           </button>
         ))}
       </div>
-      <div className="ml-auto mr-8 flex items-center header-icons">
+      <div className="absolute right-8 flex items-center header-icons text-lg">
         <button className="rounded-full bg-black text-white p-2 px-6 hover:bg-gray-800 hover:scale-105 transition-all duration-300 focus:translate-y-[2px]">
           Sign In
         </button>

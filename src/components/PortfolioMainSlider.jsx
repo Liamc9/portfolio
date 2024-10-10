@@ -177,13 +177,11 @@ body {
               classNames="fade-slide"
             >
               {/* Integrated HeroContent JSX */}
-              <div className="flex md:flex-row flex-col md:space-x-20 h-full items-center py-12 px-4 transition-all duration-500 ease-in-out">
+              <div className="flex md:flex-row flex-col md:space-x-20 h-full items-center justify-between py-12 px-60 transition-all duration-500 ease-in-out">
                 {/* Left Side Content */}
                 <div className="flex flex-col justify-between max-w-[320px] md:text-left text-center space-y-6 md:space-y-8">
                   <div>
-                    <h3 className="uppercase text-sm tracking-widest font-semibold">
-                      {currentSlide.header}
-                    </h3>
+                  
                     <h1 className="font-garamond text-7xl font-light mt-2">
                       {currentSlide.title}
                     </h1>
@@ -191,23 +189,7 @@ body {
                       {currentSlide.subtitle}
                     </h2>
                   </div>
-                  <div>
-                    <div className="font-garamond text-xl italic mb-4">
-                      {currentSlide.contentTitle}
-                    </div>
-                    <div className="text-base leading-relaxed mb-6 tracking-tight">
-                      {currentSlide.contentSubtitle}
-                    </div>
-                    <div className="flex items-center space-x-3 font-medium text-sm hover:text-blue-500 cursor-pointer">
-                      <a
-                        href={currentSlide.shopNowLink}
-                        className="hover:underline"
-                      >
-                        Shop Now
-                      </a>
-                      <ButtonArrowIcon className="w-5 h-5" />
-                    </div>
-                  </div>
+                  
                 </div>
 
                 {/* Right Side Images */}
@@ -215,14 +197,14 @@ body {
                   <div className="relative">
                     <img
                       className="rounded-full object-cover transition-transform duration-500 ease-in-out"
-                      src={currentSlide.bottleBgImage}
+                      src={currentSlide.backgroundImage}
                       alt={`${currentSlide.title} background`}
-                      style={{ width: '320px', height: '450px' }}
+                      style={{ width: '360px', height: '450px' }}
                     />
                     <img
                       className="absolute top-[25%] left-0 transform scale-150 transition-transform duration-500 ease-in-out"
-                      src={currentSlide.bottleImage}
-                      alt={`${currentSlide.title} bottle`}
+                      src={currentSlide.foregroundImage}
+                      alt={`${currentSlide.title}`}
                     />
                   </div>
                 </div>
@@ -232,13 +214,14 @@ body {
           </TransitionGroup>
 
           {/* Navigation Buttons */}
-          <div className="absolute bottom-32 right-10 z-10 flex space-x-4">
+          <div className="absolute bottom-80 left-10 z-10 flex space-x-4">
             <button
               onClick={handlePrevSlide}
               className="flex h-12 w-12 items-center justify-center rounded-full bg-white bg-opacity-75 shadow-md hover:bg-opacity-100 transition duration-200"
             >
               <ButtonArrowIcon className="transform rotate-180" />
             </button>
+            </div><div className="absolute bottom-80 right-10 z-10 flex space-x-4">
             <button
               onClick={handleNextSlide}
               className="flex h-12 w-12 items-center justify-center rounded-full bg-white bg-opacity-75 shadow-md hover:bg-opacity-100 transition duration-200"
@@ -247,10 +230,7 @@ body {
             </button>
           </div>
 
-          {/* Pagination */}
-          <div className="absolute right-10 top-10 text-base font-medium text-gray-800">
-            {currentSlideIndex + 1} / {slidesData.length}
-          </div>
+        
 
           {/* Progress Bar */}
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-300">

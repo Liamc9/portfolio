@@ -57,18 +57,6 @@ const SideNav = () => {
               <HomeIcon className="w-5 h-5 mr-3" />
               <span>Home</span>
             </Link>
-            <Link to="/webdev" className="flex items-center py-2 px-8 text-gray-200 hover:bg-gray-700 hover:bg-opacity-25 transition-colors duration-200">
-              <CodeIcon className="w-5 h-5 mr-3" />
-              <span>Web Development</span>
-            </Link>
-            <Link to="/scriptlist" className="flex items-center py-2 px-8 text-gray-200 hover:bg-gray-700 hover:bg-opacity-25 transition-colors duration-200">
-              <ScriptIcon className="w-5 h-5 mr-3" />
-              <span>Scripts and Algorithms</span>
-            </Link>
-            <Link to="/dataAnalytics" className="flex items-center py-2 px-8 text-gray-200 hover:bg-gray-700 hover:bg-opacity-25 transition-colors duration-200">
-              <DataIcon className="w-5 h-5 mr-3" />
-              <span>Data Analytics</span>
-            </Link>
           </nav>
         </div>
         <div className="flex flex-col items-center space-y-2 p-4 border-t border-gray-700">
