@@ -22,7 +22,7 @@ import { DataProvider } from '../components/DataContext';
 
         const shouldHideTopNav = () => {
           // List the paths where TopNavBar should be hidden
-          const pathsToHide = ["/updatecarddetails"];
+          const pathsToHide = ["/updatecarddetails","/login"];
           return pathsToHide.includes(location.pathname);
         };
         const shouldHideSideNav = () => {

@@ -1,12 +1,18 @@
+// Home.jsx
+
 import React, { useRef, useEffect, useState } from 'react';
 import PortfolioMainSlider from '../components/PortfolioMainSlider';
 import { ButtonArrowIcon } from '../assets/Icons';
-import { useTab } from '../components/TabContext'; // Import the useTab hook to access activeTab
+import { useTab } from '../components/TabContext';
 
-// Import the components associated with each tab
-import SearchPage from '../components/SearchPage';
-import CV from '../components/CV';
-import WebDev from '../components/WebDev';
+// Components associated with each tab
+import Overview from '../components/Overview';
+import Resume from '../components/Resume';
+import Projects from '../components/Projects';
+
+// Optional: Import an icon library or use a custom icon for the CV button
+// Example using Heroicons (install via npm: npm install @heroicons/react)
+// import { DocumentDownloadIcon } from '@heroicons/react/solid';
 
 const Home = () => {
   const contentRef = useRef(null);
@@ -17,8 +23,8 @@ const Home = () => {
   // Use the activeTab from the global context
   const { activeTab } = useTab();
 
+  // Intersection Observer to detect when the slider is in view
   useEffect(() => {
-    // Intersection Observer to detect when the slider is in view
     const observerOptions = {
       root: null,
       rootMargin: '0px',
@@ -46,72 +52,77 @@ const Home = () => {
 
   useEffect(() => {
     const handleWheel = (event) => {
+      // If we're already programmatically scrolling, prevent user scroll
       if (isScrolling.current) {
         event.preventDefault();
         return;
       }
 
-      const deltaY = event.deltaY;
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      // Only intercept the scroll if the slider is in view
+      // Once user is fully in the content section, let them scroll freely
+      if (!isSliderInView) {
+        return;
+      }
 
-      // If user scrolls down and is at the top section
-      if (deltaY > 0 && scrollTop < window.innerHeight / 2) {
-        event.preventDefault();
+      // Intercept the scroll event (don’t do the normal scroll)
+      event.preventDefault();
+
+      const deltaY = event.deltaY;
+
+      // Scrolling down from the slider
+      if (deltaY > 0) {
         isScrolling.current = true;
         contentRef.current.scrollIntoView({ behavior: 'smooth' });
         setTimeout(() => {
           isScrolling.current = false;
-        }, 800); // Adjust timeout based on scroll duration
+        }, 800);
       }
-      // If user scrolls up and is at the bottom section
-      else if (deltaY < 0 && scrollTop >= window.innerHeight / 2) {
-        event.preventDefault();
+      // Scrolling up within the slider
+      else if (deltaY < 0) {
         isScrolling.current = true;
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setTimeout(() => {
           isScrolling.current = false;
-        }, 800); // Adjust timeout based on scroll duration
+        }, 800);
       }
     };
 
     // Add wheel event listener to the window
     window.addEventListener('wheel', handleWheel, { passive: false });
 
-    // Clean up the event listener on component unmount
+    // Clean up on component unmount
     return () => {
       window.removeEventListener('wheel', handleWheel);
     };
-  }, []);
+  }, [isSliderInView]);
 
-  // Mapping of activeTab values to components
+  // Map activeTab to the correct component
   const tabComponents = {
-    'Projects': <SearchPage />,
-    'CV': <CV />,
-    'WebDev': <WebDev />,
-    // Add more mappings as needed
+    Projects: <Projects />,
+    Resume: <Resume />,
+    Overview: <Overview />,
+    // More mappings as needed...
   };
 
   const renderContent = () => {
-    // Return the component corresponding to the activeTab
-    // If no component is mapped, return null or a default component
+    // Return the component corresponding to activeTab (or null / fallback)
     return tabComponents[activeTab] || null;
   };
 
+  // CV PDF URL from Firebase Storage
+  const CV_URL =
+    'https://firebasestorage.googleapis.com/v0/b/portfolio-cc7d3.appspot.com/o/Liam_Crowley_CV.pdf?alt=media&token=d9bb5ade-2258-4cf7-9a6f-a4fefa06c2f9'; // Replace with your actual CV URL
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       {/* Slider Section */}
       <div ref={sliderRef} className="relative">
         <PortfolioMainSlider isPlaying={isSliderInView} />
 
-        {/* Scroll Down Button with shadow */}
-        <div className="absolute bottom-0 inset-x-0 flex justify-center z-20 ">
+        {/* Scroll Down Button */}
+        <div className="absolute bottom-0 inset-x-0 flex justify-center z-20">
           <div className="absolute inset-x-0 h-24 pointer-events-none bg-gradient-to-t from-black opacity-50"></div>
           <div className="relative">
-            {/* Shadow coming up from the bottom */}
-            <div
-              className="absolute inset-x-0 h-24 pointer-events-none"
-              style={{ height: '60px' }}
-            />
             <button
               onClick={() => {
                 contentRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -124,7 +135,6 @@ const Home = () => {
                   aria-hidden="true"
                 />
               </span>
-              {/* Use the global activeTab */}
               <span className="mt-2 text-xl font-semibold">
                 View {activeTab}
               </span>
@@ -135,8 +145,19 @@ const Home = () => {
 
       {/* Additional Content Below Slider */}
       <div ref={contentRef} className="bg-white py-16 px-8">
-        {/* Render content based on activeTab */}
         {renderContent()}
+      </div>
+
+      {/* Floating CV Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => window.open(CV_URL, '_blank')}
+          className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-full w-24 h-24 shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="View CV"
+          title="View CV"
+        >
+          <span className="text-sm font-semibold">View CV</span>
+        </button>
       </div>
     </div>
   );

@@ -1,78 +1,188 @@
-import React, { useState, useEffect, useContext } from 'react';
+// PortfolioMainSlider.js
+
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 import { ButtonArrowIcon } from '../assets/Icons';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from 'swiper/modules';
 import { useTab } from './TabContext';
 import { DataContext } from './DataContext';
 
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/autoplay';
+
+const SliderWrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  position: relative;
+`;
+
+const StyledSwiper = styled(Swiper)`
+  width: 100%;
+  min-height: 100vh;
+`;
+
+const SlideContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  align-items: center;
+  padding: 2rem 1rem;
+  transition: all 0.5s ease-in-out;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    padding: 4rem 10rem;
+    gap: 4rem;
+  }
+`;
+
+const LeftContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  text-align: center;
+  gap: 1.25rem;
+
+  @media (min-width: 768px) {
+    text-align: left;
+    gap: 2rem;
+  }
+
+  h1 {
+    font-family: 'Garamond', serif;
+    font-weight: 300;
+    margin: 0.5rem 0;
+    font-size: 3rem;
+    line-height: 1.2;
+
+    @media (min-width: 768px) {
+      font-size: 4rem;
+    }
+  }
+
+  h2 {
+    font-family: 'Garamond', serif;
+    font-weight: 300;
+    margin: 1rem 0 2rem;
+    font-size: 1.25rem;
+    line-height: 1.4;
+
+    @media (min-width: 768px) {
+      font-size: 2rem;
+      margin-bottom: 3rem;
+    }
+  }
+`;
+
+const RightImages = styled.div`
+  position: relative;
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+
+  @media (min-width: 768px) {
+    margin-top: 0;
+  }
+
+
+  img.foregroundImage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s ease-in-out;
+  }
+`;
+
+
+/* Give it a high z-index, and use a more visible color if your slide background is dark. */
+const ProgressBarContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0.6rem;
+  background-color: #d1d5db;
+  z-index: 9999; /* Ensures it is on top */
+`;
+
+const Progress = styled.div`
+  height: 100%;
+  background-color:rgb(0, 0, 0); /* Change to white for contrast if slides are dark */
+  width: ${(props) => props.width}%;
+  transition: width 0.1s linear;
+`;
+
+const Loader = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 2rem;
+`;
+
 const PortfolioMainSlider = ({ isPlaying }) => {
   const { slidesData } = useContext(DataContext);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const { activeTab, setActiveTab } = useTab();
   const [progress, setProgress] = useState(0);
+  const swiperRef = useRef(null);
+
   const slideDuration = 5000; // 5 seconds
 
-  // Use activeTab from the context
-  const { activeTab, setActiveTab } = useTab();
-
-  // Update currentSlideIndex when activeTab changes in the context
+  // Update active slide based on activeTab
   useEffect(() => {
-    if (slidesData.length > 0) {
-      const tabIndex = slidesData.findIndex(
+    if (slidesData.length > 0 && swiperRef.current) {
+      const slideIndex = slidesData.findIndex(
         (slide) => slide.title === activeTab
       );
-      if (tabIndex !== -1 && tabIndex !== currentSlideIndex) {
-        setCurrentSlideIndex(tabIndex);
-        setProgress(0); // Reset progress on tab change
+      if (slideIndex !== -1 && slideIndex !== swiperRef.current.realIndex) {
+        swiperRef.current.slideTo(slideIndex);
       }
     }
-  }, [activeTab, slidesData, currentSlideIndex]);
+  }, [activeTab, slidesData]);
 
+  // Handle progress bar
   useEffect(() => {
-    let progressInterval;
-
-    if (isPlaying && slidesData.length > 0) {
-      setProgress(0); // Reset progress when starting
-      const progressStep = 100 / (slideDuration / 100); // Update every 100ms
-
-      progressInterval = setInterval(() => {
-        setProgress((prevProgress) => {
-          const nextProgress = prevProgress + progressStep;
+    let interval;
+    if (isPlaying) {
+      setProgress(0);
+      interval = setInterval(() => {
+        setProgress((prev) => {
+          const nextProgress = prev + 100 / (slideDuration / 100);
           if (nextProgress >= 100) {
-            clearInterval(progressInterval);
-            handleNextSlide();
-            return 0;
+            return 100;
           }
           return nextProgress;
         });
       }, 100);
+    } else {
+      // If you want the progress bar to remain visible (or partially complete),
+      // remove this line. Otherwise, it resets to 0 on pause:
+      setProgress(0);
     }
 
     return () => {
-      if (progressInterval) clearInterval(progressInterval);
+      if (interval) clearInterval(interval);
     };
-  }, [isPlaying, currentSlideIndex, slidesData]);
+  }, [isPlaying, activeTab]);
 
-  const handleNextSlide = () => {
-    if (slidesData.length > 0) {
-      const nextIndex =
-        currentSlideIndex === slidesData.length - 1 ? 0 : currentSlideIndex + 1;
-      setCurrentSlideIndex(nextIndex);
-      setActiveTab(slidesData[nextIndex].title); // Update activeTab in context
+  // Handle Swiper autoplay
+  useEffect(() => {
+    if (swiperRef.current) {
+      if (isPlaying) {
+        swiperRef.current.autoplay.start();
+      } else {
+        swiperRef.current.autoplay.stop();
+      }
     }
-  };
-
-  const handlePrevSlide = () => {
-    if (slidesData.length > 0) {
-      const prevIndex =
-        currentSlideIndex === 0
-          ? slidesData.length - 1
-          : currentSlideIndex - 1;
-      setCurrentSlideIndex(prevIndex);
-      setActiveTab(slidesData[prevIndex].title); // Update activeTab in context
-    }
-  };
-
-  const currentSlide =
-    slidesData.length > 0 ? slidesData[currentSlideIndex] : null;
+  }, [isPlaying]);
 
   // Preload images to prevent stuttering
   useEffect(() => {
@@ -86,163 +196,62 @@ const PortfolioMainSlider = ({ isPlaying }) => {
     }
   }, [slidesData]);
 
-  if (!currentSlide) {
-    // You can replace this with a loader component if you have one
-    return <div>Loading...</div>;
+  if (!slidesData || slidesData.length === 0) {
+    return <Loader>Loading...</Loader>;
   }
 
   return (
-    <>
-    <style>
-      {`
-/* Transition classes for fade and slide animations */
-.fade-slide-enter {
-  opacity: 0;
-  transform: translateX(100%);
-}
-.fade-slide-enter-active {
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 600ms ease-in-out, transform 600ms ease-in-out;
-}
-.fade-slide-exit {
-  opacity: 1;
-  transform: translateX(0);
-}
-.fade-slide-exit-active {
-  opacity: 0;
-  transform: translateX(-100%);
-  transition: opacity 600ms ease-in-out, transform 600ms ease-in-out;
-}
-
-/* Progress Bar Styling */
-.progress-bar {
-  height: 100%;
-  background-color: black;
-  width: 0%;
-}
-
-@keyframes progressAnimation {
-  from {
-    width: 0%;
-  }
-  to {
-    width: 100%;
-  }
-}
-
-/* Additional Styling for a Nicer Layout */
-body {
-  margin: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-.slider-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.slider-content {
-  flex-grow: 1;
-  position: relative;
-}
-
-.slider-navigation {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-}
-
-.slider-pagination {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  color: #333;
-  font-weight: bold;
-}
-
-      `}
-      </style>
-      <div className="min-h-screen">
-      <div
-        className="relative h-screen w-full flex flex-col"
-        style={{ backgroundColor: currentSlide.backgroundColor }}
+    <SliderWrapper>
+      <StyledSwiper
+        modules={[Navigation, Autoplay]}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        navigation={{
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        }}
+        autoplay={
+          isPlaying
+            ? {
+                delay: slideDuration,
+                disableOnInteraction: false,
+              }
+            : false
+        }
+        loop={true}
+        onSlideChange={(swiper) => {
+          setActiveTab(slidesData[swiper.realIndex].title);
+          // Reset progress to 0 whenever the slide changes
+          setProgress(0);
+        }}
       >
-        {/* Hero Content with Transition */}
-        <div className="relative flex-grow overflow-hidden">
-          <TransitionGroup className="h-full">
-            <CSSTransition
-              key={currentSlide.id}
-              timeout={600}
-              classNames="fade-slide"
-            >
-              {/* Integrated HeroContent JSX */}
-              <div className="flex md:flex-row flex-col md:space-x-20 h-full items-center justify-between py-12 px-60 transition-all duration-500 ease-in-out">
-                {/* Left Side Content */}
-                <div className="flex flex-col justify-between max-w-[320px] md:text-left text-center space-y-6 md:space-y-8">
-                  <div>
-                  
-                    <h1 className="font-garamond text-7xl font-light mt-2">
-                      {currentSlide.title}
-                    </h1>
-                    <h2 className="font-garamond text-3xl font-light mt-4 mb-10">
-                      {currentSlide.subtitle}
-                    </h2>
-                  </div>
-                  
-                </div>
+        {slidesData.map((slide) => (
+          <SwiperSlide key={slide.id}>
+            <SlideContent style={{ backgroundColor: slide.backgroundColor }}>
+              <LeftContent>
+                <h1>{slide.title}</h1>
+                <h2>{slide.subtitle}</h2>
+              </LeftContent>
+              <RightImages>
+                <img
+                  className="foregroundImage"
+                  src={slide.foregroundImage}
+                  alt={slide.title}
+                />
+              </RightImages>
+            </SlideContent>
+          </SwiperSlide>
+        ))}
 
-                {/* Right Side Images */}
-                <div className="flex justify-center items-center relative md:mt-0 mt-10">
-                  <div className="relative">
-                    <img
-                      className="rounded-full object-cover transition-transform duration-500 ease-in-out"
-                      src={currentSlide.backgroundImage}
-                      alt={`${currentSlide.title} background`}
-                      style={{ width: '360px', height: '450px' }}
-                    />
-                    <img
-                      className="absolute top-[25%] left-0 transform scale-150 transition-transform duration-500 ease-in-out"
-                      src={currentSlide.foregroundImage}
-                      alt={`${currentSlide.title}`}
-                    />
-                  </div>
-                </div>
-              </div>
-              {/* End of integrated HeroContent JSX */}
-            </CSSTransition>
-          </TransitionGroup>
+     
 
-          {/* Navigation Buttons */}
-          <div className="absolute bottom-80 left-10 z-10 flex space-x-4">
-            <button
-              onClick={handlePrevSlide}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-white bg-opacity-75 shadow-md hover:bg-opacity-100 transition duration-200"
-            >
-              <ButtonArrowIcon className="transform rotate-180" />
-            </button>
-            </div><div className="absolute bottom-80 right-10 z-10 flex space-x-4">
-            <button
-              onClick={handleNextSlide}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-white bg-opacity-75 shadow-md hover:bg-opacity-100 transition duration-200"
-            >
-              <ButtonArrowIcon />
-            </button>
-          </div>
-
-        
-
-          {/* Progress Bar */}
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-300">
-            <div
-              className="h-full bg-black transition-width duration-100"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </>
+        {/* Progress Bar */}
+        <ProgressBarContainer>
+          <Progress width={progress} />
+        </ProgressBarContainer>
+      </StyledSwiper>
+    </SliderWrapper>
   );
 };
 

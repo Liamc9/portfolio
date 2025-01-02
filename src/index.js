@@ -3,9 +3,9 @@ import React from 'react';
       import './index.css';
       import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
       import Root from './routes/root';
-      import Signup from './routes/signup';
-      import Login from './routes/login';
+      import Login from './routes/Login';
     import Home from './routes/home';
+import { AuthProvider } from './context/AuthContext';
       const router = createBrowserRouter([
           {
               path: '',
@@ -13,11 +13,7 @@ import React from 'react';
               children: [
                   {
                       index: true, // This makes it the default route for the parent path
-                      element: <Navigate to="/signup" replace />, // Redirect to /signup
-                  },
-                  {
-                      path: 'signup',
-                      element: <Signup />,
+                      element: <Navigate to="/home" replace />, // Redirect to /home
                   },
                   {
                       path: 'login',
@@ -35,6 +31,8 @@ import React from 'react';
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(
           <React.StrictMode>
+            <AuthProvider>
               <RouterProvider router={router} />
+              </AuthProvider>
           </React.StrictMode>
       );
