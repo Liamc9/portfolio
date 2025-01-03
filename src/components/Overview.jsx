@@ -480,7 +480,7 @@ const Overview = () => {
           <FaGithub className='h-14 w-14'/>
             GitHub 
           </ResourceTile>
-          <ResourceTile href="https://storybook.com" target="_blank" rel="noopener noreferrer">
+          <ResourceTile href="https://liamc9.github.io/Storybook/" target="_blank" rel="noopener noreferrer">
           <StorybookIcon className='h-14 w-14'/>
             Storybook 
           </ResourceTile>
