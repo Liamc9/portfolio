@@ -488,9 +488,9 @@ const Overview = () => {
           <FaFigma className='h-14 w-14'/>
             Figma 
           </ResourceTile>
-          <ResourceTile href="https://example.com/resource4" target="_blank" rel="noopener noreferrer">
+          <ResourceTile href="https://www.npmjs.com/~liamc9?activeTab=packages" target="_blank" rel="noopener noreferrer">
           <FaQuestion className='h-14 w-14'/>
-            Other
+            NPM
           </ResourceTile>
         </ResourcesGrid>
       </Tile7>
